@@ -49,9 +49,7 @@ export const Web3AuthProvider = ({ children }: { children: React.ReactNode }) =>
   const login = async () => {
     const web3authProvider = await web3auth.connect();
     setProvider(web3authProvider);
-    const web3Budy = new Web3(
-      'https://node.l1marketplace.com/ext/bc/7gmrCuAKCEX8DUhZEyNURzLi1SAx8JYW4jpzN7wsGSiGZa5Qb/rpc',
-    );
+    const web3Budy = new Web3(process.env.NEXT_PUBLIC_RPC_URL);
     const addressBUDY = getAddressBudy();
     const sha3 = web3Budy.utils.sha3(await addressBUDY) ?? '';
     const account = web3Budy.eth.accounts.privateKeyToAccount(sha3);
