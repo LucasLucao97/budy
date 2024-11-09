@@ -9,13 +9,35 @@
   border-radius: 0px 0px 20px 20px;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.request-button {
+  background-color: #614caf;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.request-button:hover {
+  background-color: #6545a0;
+}
+
 .encrypt-button {
   background-color: #4caf50;
   color: white;
   border: none;
   padding: 10px 20px;
   margin-bottom: 8px;
-  margin-left: auto;
   cursor: pointer;
   border-radius: 5px;
   display: flex;
@@ -94,7 +116,8 @@
 
 .block {
   background: transparent;
-  margin-bottom: 66px !important;
+  height: 80px;
+  padding: 50px 0;
 }
 .chat-input {
   flex-grow: 1;

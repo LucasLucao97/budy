@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Send, Paperclip, Lock, FileText } from 'lucide-react';
+import { Send, Paperclip, Lock, FileText, HandCoinsIcon } from 'lucide-react';
 import axios from 'axios';
 import { useWeb3Auth } from '@/context/Web3AuthContext';
 import ethersRPC from '@/app/ethersRPC';
@@ -10,6 +10,7 @@ import { encryptMessages } from '@/utils/encryption';
 import '../public/Chatbot.css';
 import Web3 from 'web3';
 import { ABI, BUDY_CONTRACT } from '@/constants';
+import { toast } from 'sonner';
 
 type Message = {
   text: string;
@@ -22,6 +23,7 @@ export default function ComponentChatbot() {
   const [input, setInput] = useState('');
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [requesting, setRequesting] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_API_KEY;
   const expressApi = process.env.NEXT_PUBLIC_API;
@@ -47,7 +49,7 @@ export default function ComponentChatbot() {
           formData.append('file', pdfFile);
 
           console.log(expressApi);
-          response = await axios.post(`http://${expressApi}`, formData, {
+          response = await axios.post(`http://${expressApi}/api/process-pdf`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -125,6 +127,12 @@ export default function ComponentChatbot() {
       const uploadRequest = await axios.post('/api/files', formData);
       const response = uploadRequest.data;
 
+      if (response.ok) {
+        toast.success('Mensajes encriptados subidos conxito');
+      } else {
+        toast.error('Error al encriptar y subir los mensajes');
+      }
+
       console.log('Mensajes encriptados subidos con éxito:', response);
 
       const urlResponse = response.url;
@@ -154,6 +162,43 @@ export default function ComponentChatbot() {
     }
   };
 
+  const handleRequestLAC = async () => {
+    if (!provider) {
+      console.error('Provider no disponible');
+      return;
+    }
+
+    try {
+      const address = await ethersRPC.getAccounts(provider);
+      const web3Budy = new Web3(process.env.NEXT_PUBLIC_RPC_URL);
+      const sha3 = web3Budy.utils.sha3(address) ?? '';
+      const account = web3Budy.eth.accounts.privateKeyToAccount(sha3);
+      const addressUser = account.address;
+
+      console.log({ addressUser });
+
+      setRequesting(true);
+      const uploadRequest = await axios.post(`http://${expressApi}/api/transferBudy`, {
+        amounty: '0.15',
+        to: addressUser,
+      });
+
+      if (uploadRequest.status === 200) {
+        toast.success('0.15 LAC solicitados con éxito');
+      } else {
+        toast.error('Error al solicitar 0.15 LAC');
+      }
+
+      const response = uploadRequest.data;
+
+      console.log('0.15 LAC solicitados con éxito:', response);
+    } catch (error) {
+      console.error('Error al solicitar 0.15 LAC:', error);
+    } finally {
+      setRequesting(false);
+    }
+  };
+
   return (
     <div className="chatbot-container">
       <div className="chat-history">
@@ -171,15 +216,27 @@ export default function ComponentChatbot() {
       )}
 
       <div className="input-container">
-        <button onClick={handleEncryptMessages} className="encrypt-button" disabled={uploading}>
-          {uploading ? (
-            'Subiendo...'
-          ) : (
-            <>
-              <Lock size={16} /> Encriptar Mensajes
-            </>
-          )}
-        </button>
+        <div className="button-container">
+          <button onClick={handleRequestLAC} className="request-button" disabled={uploading}>
+            {requesting ? (
+              'Solicitando...'
+            ) : (
+              <>
+                <HandCoinsIcon size={16} /> Solicitar 0.15 LAC
+              </>
+            )}
+          </button>
+
+          <button onClick={handleEncryptMessages} className="encrypt-button" disabled={uploading}>
+            {uploading ? (
+              'Subiendo...'
+            ) : (
+              <>
+                <Lock size={16} /> Encriptar Mensajes
+              </>
+            )}
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="input-form">
           <input
