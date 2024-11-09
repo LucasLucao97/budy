@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './ChatbotBackgroundImage.css';
-import HeaderSelector from '@/components/HeaderSelector';
 import { Web3AuthProvider } from '@/context/Web3AuthContext';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
   title: 'Budy',
@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="ChatbotBackgroundImage">
         <Web3AuthProvider>
-          <HeaderSelector />
+          <Header />
           {children}
         </Web3AuthProvider>
       </body>
