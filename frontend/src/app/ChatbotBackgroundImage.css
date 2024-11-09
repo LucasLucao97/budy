@@ -1,0 +1,6 @@
+.ChatbotBackgroundImage {
+  background-image: url("/images/darkBlueBackGround.svg");
+  background-position: top;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
